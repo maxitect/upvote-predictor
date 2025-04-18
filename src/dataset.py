@@ -5,8 +5,10 @@ import datetime
 
 class Wiki(torch.utils.data.Dataset):
     def __init__(self, skip_gram=True):
-        self.vocab_to_int = pickle.load(open('./tkn_words_to_ids.pkl', 'rb'))
-        self.int_to_vocab = pickle.load(open('./tkn_ids_to_words.pkl', 'rb'))
+        self.vocab_to_int = pickle.load(
+            open('./models/skipgram/tkn_words_to_ids.pkl', 'rb'))
+        self.int_to_vocab = pickle.load(
+            open('./models/skipgram/tkn_ids_to_words.pkl', 'rb'))
         self.corpus = pickle.load(open('./corpus.pkl', 'rb'))
         self.tokens = [self.vocab_to_int[word] for word in self.corpus]
         self.skip_gram = skip_gram
