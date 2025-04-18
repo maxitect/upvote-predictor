@@ -66,7 +66,7 @@ print(words_to_ids['anarchism'])  # 5234
 print(words_to_ids['have'])      # 3081
 print(len(words_to_ids))         # 63,642
 
-with open(config.ID_TO_VOCAB_PATH, 'wb') as f:
-    pickle.dump(words_to_ids, f)
 with open(config.VOCAB_TO_ID_PATH, 'wb') as f:
+    pickle.dump(words_to_ids, f)
+with open(config.ID_TO_VOCAB_PATH, 'wb') as f:
     pickle.dump(ids_to_words, f)

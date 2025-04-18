@@ -10,7 +10,7 @@ class SkipGram(torch.nn.Module):
 
     def forward(self, inpt):
         emb = self.emb(inpt)
-        out = self.ffw(emb)
+        out = self.ffw(emb.squeeze(1))
         return out
 
 

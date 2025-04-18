@@ -3,7 +3,6 @@ import wandb
 import pickle
 import datetime
 import pandas as pd
-import psycopg
 from tqdm import tqdm
 import src.model as model
 import src.dataset as dataset
@@ -13,19 +12,25 @@ import os
 dev = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 ts = datetime.datetime.now().strftime('%Y_%m_%d__%H_%M_%S')
 
-conn = psycopg.connect(
-    "postgres://postgres:postgres@localhost:5432/hackernews")
-query = "SELECT title, domain, timestamp, score FROM stories"
-df = pd.read_sql(query, conn)
-conn.close()
+df = pd.read_csv(
+    "hf://datasets/artemisweb/hackernewsupvotes/filtered-stories.csv")
+
+# Convert data into the right format
+titles = df['title'].fillna('').values
+urls = df['url'].fillna('').values
+domains = [
+    url.split('/')[2] if url and '/' in url else '<no_domain>' for url in urls]
+timestamps = [pd.to_datetime(time).isoformat() for time in df['time']]
+scores = df['score'].values
 
 vocab_to_int = pickle.load(open(config.VOCAB_TO_ID_PATH, 'rb'))
 
+# And then update the dataset creation to:
 ds = dataset.HackerNewsDataset(
-    df['title'].values,
-    df['domain'].values,
-    df['timestamp'].values,
-    df['score'].values,
+    titles,
+    domains,
+    timestamps,
+    scores,
     vocab_to_int,
     max_title_len=config.MAX_TITLE_LENGTH
 )
@@ -55,6 +60,7 @@ wandb.init(project='mlx7-week1-regressor', name=f'{ts}')
 best_val_loss = float('inf')
 
 for epoch in range(config.REGRESSOR_EPOCHS):
+    print(f"Epoch {epoch+1} started")
     regressor.train()
     train_loss = 0
     train_progress = tqdm(

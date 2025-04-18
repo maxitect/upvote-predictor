@@ -34,7 +34,8 @@ SKIPGRAM_BEST_MODEL_PATH = os.path.join(
     SKIPGRAM_CHECKPOINT_DIR, 'best_model.pth')
 DOMAIN_MAPPING_PATH = os.path.join(DOMAIN_CHECKPOINT_DIR, 'domain_mapping.pth')
 REGRESSOR_BEST_MODEL_PATH = os.path.join(
-    REGRESSOR_CHECKPOINT_DIR, 'best_model.pth')
+    REGRESSOR_CHECKPOINT_DIR, 'best_model.pth'
+)
 
 # API settings
 MODEL_VERSION = "0.1.0"

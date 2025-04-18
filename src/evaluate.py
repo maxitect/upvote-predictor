@@ -1,6 +1,6 @@
+import src.config as config
 import torch
 import pickle
-import src.config as config
 
 
 vocab_to_int = pickle.load(

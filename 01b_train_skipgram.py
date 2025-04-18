@@ -35,7 +35,7 @@ for epoch in range(config.SKIPGRAM_EPOCHS):
         ipt, trg = ipt.to(dev), trg.to(dev)
         opFoo.zero_grad()
         out = mFoo(ipt)
-        loss = criterion(out, trg.squeeze())
+        loss = criterion(out, trg.view(-1))
         loss.backward()
         opFoo.step()
 
