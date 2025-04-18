@@ -21,13 +21,13 @@ REGRESSOR_CHECKPOINT_DIR = './models/regressor'
 
 # File paths
 CORPUS_PATH = os.path.join(
-    SKIPGRAM_CHECKPOINT_DIR, './corpus.pkl'
+    SKIPGRAM_CHECKPOINT_DIR, 'corpus.pkl'
 )
 VOCAB_TO_ID_PATH = os.path.join(
-    SKIPGRAM_CHECKPOINT_DIR, './tkn_words_to_ids.pkl'
+    SKIPGRAM_CHECKPOINT_DIR, 'tkn_words_to_ids.pkl'
 )
 ID_TO_VOCAB_PATH = os.path.join(
-    SKIPGRAM_CHECKPOINT_DIR, './tkn_ids_to_words.pkl'
+    SKIPGRAM_CHECKPOINT_DIR, 'tkn_ids_to_words.pkl'
 )
 
 SKIPGRAM_BEST_MODEL_PATH = os.path.join(
