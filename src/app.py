@@ -25,18 +25,19 @@ class Post(BaseModel):
     timestamp: str
 
 
-vocab_to_int = pickle.load(open('./models/tkn_words_to_ids.pkl', 'rb'))
+vocab_to_int = pickle.load(
+    open('./models/skipgram/tkn_words_to_ids.pkl', 'rb'))
 skipgram = model.SkipGram(len(vocab_to_int), 128)
 skipgram.load_state_dict(torch.load(
-    './models/best_model.skipgram.pth'))
+    './models/skipgram/best_model.pth'))
 skipgram.eval()
 
 regressor = model.Regressor(emb_dim=128, domain_size=1000)
 regressor.load_state_dict(torch.load(
-    './models/best_model.regressor.pth'))
+    './models/regressor/best_model.pth'))
 regressor.eval()
 
-domain_to_idx = torch.load('./models/domain_to_idx.pth')
+domain_to_idx = torch.load('./models/domain/domain_to_idx.pth')
 
 
 def extract_domain(title):
