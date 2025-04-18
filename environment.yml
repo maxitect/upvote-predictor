@@ -14,3 +14,4 @@ dependencies:
   - pydantic-settings=2.8.1
   - pandas=2.2.3
   - wandb==0.19.8
+  - tqdm=4.67.1
