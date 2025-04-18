@@ -1,11 +1,12 @@
 import torch
 import pickle
+import config
 
 
 vocab_to_int = pickle.load(
-    open('./models/skipgram/tkn_words_to_ids.pkl', 'rb'))
+    open(config.VOCAB_TO_ID_PATH, 'rb'))
 int_to_vocab = pickle.load(
-    open('./models/skipgram/tkn_ids_to_words.pkl', 'rb'))
+    open(config.ID_TO_VOCAB_PATH, 'rb'))
 
 
 def topk(mFoo):
