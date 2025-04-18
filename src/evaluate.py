@@ -2,8 +2,10 @@ import torch
 import pickle
 
 
-vocab_to_int = pickle.load(open('./tkn_words_to_ids.pkl', 'rb'))
-int_to_vocab = pickle.load(open('./tkn_ids_to_words.pkl', 'rb'))
+vocab_to_int = pickle.load(
+    open('./models/skipgram/tkn_words_to_ids.pkl', 'rb'))
+int_to_vocab = pickle.load(
+    open('./models/skipgram/tkn_ids_to_words.pkl', 'rb'))
 
 
 def topk(mFoo):
