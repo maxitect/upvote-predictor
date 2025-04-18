@@ -5,8 +5,8 @@ import pickle
 import datetime
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-import model
-import config
+import src.model as model
+import src.config as config
 
 os.makedirs(config.LOG_DIR_PATH, exist_ok=True)
 if not os.path.exists(config.LOG_PATH):
