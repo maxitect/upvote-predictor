@@ -1,11 +1,11 @@
+import datetime
 import tqdm
 import wandb
 import torch
-import dataset
-import evaluate
-import datetime
-import model
-import config
+import src.dataset as dataset
+import src.evaluate as evaluate
+import src.model as model
+import src.config as config
 import os
 
 torch.manual_seed(42)
