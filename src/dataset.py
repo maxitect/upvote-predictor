@@ -1,7 +1,7 @@
 import torch
 import pickle
 import datetime
-import config
+import src.config as config
 
 
 class Wiki(torch.utils.data.Dataset):
