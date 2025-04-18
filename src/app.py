@@ -6,14 +6,11 @@ import datetime
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import model
+import config
 
-model_version = "0.1.0"
-log_dir_path = "/var/log/app"
-log_path = f"{log_dir_path}/V-{model_version}.log"
-
-os.makedirs(log_dir_path, exist_ok=True)
-if not os.path.exists(log_path):
-    with open(log_path, 'w') as f:
+os.makedirs(config.LOG_DIR_PATH, exist_ok=True)
+if not os.path.exists(config.LOG_PATH):
+    with open(config.LOG_PATH, 'w') as f:
         f.write('')
 
 app = FastAPI()
@@ -25,19 +22,16 @@ class Post(BaseModel):
     timestamp: str
 
 
-vocab_to_int = pickle.load(
-    open('./models/skipgram/tkn_words_to_ids.pkl', 'rb'))
-skipgram = model.SkipGram(len(vocab_to_int), 128)
-skipgram.load_state_dict(torch.load(
-    './models/skipgram/best_model.pth'))
+vocab_to_int = pickle.load(open(config.VOCAB_TO_ID_PATH, 'rb'))
+skipgram = model.SkipGram(len(vocab_to_int), config.EMBEDDING_DIM)
+skipgram.load_state_dict(torch.load(config.SKIPGRAM_BEST_MODEL_PATH))
 skipgram.eval()
 
-regressor = model.Regressor(emb_dim=128, domain_size=1000)
-regressor.load_state_dict(torch.load(
-    './models/regressor/best_model.pth'))
+regressor = model.Regressor(emb_dim=config.EMBEDDING_DIM, domain_size=1000)
+regressor.load_state_dict(torch.load(config.REGRESSOR_BEST_MODEL_PATH))
 regressor.eval()
 
-domain_to_idx = torch.load('./models/domain/domain_to_idx.pth')
+domain_to_idx = torch.load(config.DOMAIN_MAPPING_PATH)
 
 
 def extract_domain(title):
@@ -48,17 +42,17 @@ def extract_domain(title):
     return '<no_domain>'
 
 
-def preprocess_title(title, max_len=100):
+def preprocess_title(title):
     title_tokens = title.lower().split()
     title_ids = []
-    for word in title_tokens[:max_len]:
+    for word in title_tokens[:config.MAX_TITLE_LENGTH]:
         if word in vocab_to_int:
             title_ids.append(vocab_to_int[word])
         else:
             title_ids.append(0)
 
-    if len(title_ids) < max_len:
-        title_ids.extend([0] * (max_len - len(title_ids)))
+    if len(title_ids) < config.MAX_TITLE_LENGTH:
+        title_ids.extend([0] * (config.MAX_TITLE_LENGTH - len(title_ids)))
 
     return torch.tensor([title_ids])
 
@@ -77,12 +71,12 @@ def ping():
 
 @app.get("/version")
 def version():
-    return {"version": model_version}
+    return {"version": config.MODEL_VERSION}
 
 
 @app.get("/logs")
 def logs():
-    with open(log_path, 'r') as f:
+    with open(config.LOG_PATH, 'r') as f:
         log_entries = f.readlines()
 
     parsed_logs = []
@@ -120,13 +114,13 @@ async def how_many_upvotes(post: Post):
 
         log_entry = {
             "Latency": latency,
-            "Version": model_version,
+            "Version": config.MODEL_VERSION,
             "Timestamp": end_time,
-            "Input": post.dict(),
+            "Input": post.model_dump(),
             "Prediction": upvotes
         }
 
-        with open(log_path, 'a') as f:
+        with open(config.LOG_PATH, 'a') as f:
             f.write(json.dumps(log_entry) + '\n')
 
         return {"upvotes": upvotes}
@@ -137,13 +131,13 @@ async def how_many_upvotes(post: Post):
 
         log_entry = {
             "Latency": latency,
-            "Version": model_version,
+            "Version": config.MODEL_VERSION,
             "Timestamp": end_time,
-            "Input": post.model_dump(),
+            "Input": post.dict(),
             "Error": str(e)
         }
 
-        with open(log_path, 'a') as f:
+        with open(config.LOG_PATH, 'a') as f:
             f.write(json.dumps(log_entry) + '\n')
 
         raise HTTPException(status_code=500, detail=str(e))
