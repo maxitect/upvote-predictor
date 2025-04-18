@@ -1,0 +1,16 @@
+# To create the conda environment, run:
+#   conda env create -f environment.yml
+name: upvote-predictor
+channels:
+  - defaults
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.13.3
+  - pytorch=2.6
+  - psycopg=3.2.6
+  - fastapi=0.112.2
+  - uvicorn=0.32.1
+  - pydantic-settings=2.8.1
+  - pandas=2.2.3
+  - wandb==0.19.8
