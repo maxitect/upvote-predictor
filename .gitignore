@@ -29,6 +29,8 @@ htmlcov/
 *.pth
 *.onnx
 *.csv
+*.pkl
+text8
 
 # Jupyter Notebooks
 .ipynb_checkpoints
