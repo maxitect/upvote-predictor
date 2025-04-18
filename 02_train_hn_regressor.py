@@ -5,9 +5,9 @@ import datetime
 import pandas as pd
 import psycopg
 from tqdm import tqdm
-import model
-import dataset
-import config
+import src.model as model
+import src.dataset as dataset
+import src.config as config
 import os
 
 dev = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
