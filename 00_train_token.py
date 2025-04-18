@@ -1,7 +1,7 @@
 import collections
 import requests
 import pickle
-import config
+import src.config as config
 
 r = requests.get(
     'https://huggingface.co/datasets/ardMLX/text8/resolve/main/text8')
@@ -37,7 +37,7 @@ print(len(corpus))  # 16,680,599
 print(corpus[:7])
 
 # once saved, check content with: head -c 100 corpus.json
-with open('corpus.pkl', 'wb') as f:
+with open(config.CORPUS_PATH, 'wb') as f:
     pickle.dump(corpus, f)
 
 
