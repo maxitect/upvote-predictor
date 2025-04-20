@@ -1,48 +1,30 @@
-import requests
-import pandas as pd
-import os
-import pickle
-import src.config as config
+from src.utils.db_connector import extract_hn_data, load_to_new_db
 
-# Create directories
-os.makedirs(config.DOMAIN_CHECKPOINT_DIR, exist_ok=True)
+print("Starting data processing...")
 
-print("Downloading Hacker News dataset...")
-# Download the dataset as a parquet file
-r = requests.get('https://huggingface.co/datasets/artemisweb/hackernewsupvotes/resolve/main/data/train.parquet')
-with open('hn_data.parquet', 'wb') as f:
-    f.write(r.content)
+# Extract data from remote database
+df = extract_hn_data()
+print(f"Processed {len(df)} records")
+print("Sample data:")
+print(df.head())
 
-# Read the parquet file with pandas
-print("Processing dataset...")
-df = pd.read_parquet('hn_data.parquet')
+# Load data to local database
+load_to_new_db(df)
 
-# Extract the needed columns
-titles = df['title'].fillna('').tolist()
-urls = df['url'].fillna('').tolist()
-domains = [url.split('/')[2] if url and '/' in url else '<no_domain>' for url in urls]
-timestamps = [pd.to_datetime(time).isoformat() for time in df['time']]
-scores = df['score'].tolist()
+print("\nStatistics of processed data:")
+print(f"Total records: {len(df)}")
+print(f"Average score: {df['score'].mean():.2f}")
+print(f"Max score: {df['score'].max()}")
+print(f"Average title length: {df['title_length'].mean():.2f} characters")
+print("Top 5 domains by average score:")
+print(df.groupby('domain')['score'].mean(
+).sort_values(ascending=False).head(5))
 
-print(f"Processed {len(titles)} records")
+print("\nWeekday score distribution:")
+day_names = ['Monday', 'Tuesday', 'Wednesday',
+             'Thursday', 'Friday', 'Saturday', 'Sunday']
+day_stats = df.groupby('day_of_week')['score'].mean().reindex(range(7))
+for day in range(7):
+    print(f"{day_names[day]}: {day_stats[day]:.2f}")
 
-# Create domain mapping
-domain_to_idx = {d: i+1 for i, d in enumerate(set(domains))}
-domain_to_idx['<UNK>'] = 0
-
-# Save processed data
-hn_dataset = {
-    'titles': titles,
-    'domains': domains,
-    'timestamps': timestamps, 
-    'scores': scores
-}
-
-print("Saving data...")
-with open(os.path.join(config.DOMAIN_CHECKPOINT_DIR, 'hn_dataset.pkl'), 'wb') as f:
-    pickle.dump(hn_dataset, f)
-
-with open(config.DOMAIN_MAPPING_PATH, 'wb') as f:
-    pickle.dump(domain_to_idx, f)
-
-print(f"Data processing complete: {len(titles)} records saved")
+print("\nData processing complete!")
