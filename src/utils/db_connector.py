@@ -23,9 +23,11 @@ def extract_hn_data():
         score,
         time,
         by as author
-    FROM stories
+    FROM hacker_news.items
     WHERE score >= 1
+    AND type = 'story'
     AND title IS NOT NULL
+    AND dead IS NULL
     AND LENGTH(title) > 0
     ORDER BY time DESC
     """
@@ -41,31 +43,65 @@ def extract_hn_data():
     df = df[df['title_length'] <= 300]
     df = df[df['score'] <= 1000]
 
-    return df[['title', 'domain', 'timestamp', 'score', 'author']]
+    # Add derived time features
+    df['day_of_week'] = pd.to_datetime(df['timestamp']).dt.dayofweek
+    df['hour_of_day'] = pd.to_datetime(df['timestamp']).dt.hour
+
+    return df[[
+        'title',
+        'domain',
+        'timestamp',
+        'score',
+        'author',
+        'day_of_week',
+        'hour_of_day',
+        'title_length'
+    ]]
 
 
 def load_to_new_db(df):
     conn = psycopg.connect(
-        "postgres://postgres:postgres@localhost:5432/hackernews")
+        "postgresql://postgres:postgres@localhost:5433/hackernews")
 
     cursor = conn.cursor()
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS stories (
+    DROP TABLE IF EXISTS stories;
+    CREATE TABLE stories (
         id SERIAL PRIMARY KEY,
         title TEXT NOT NULL,
         domain TEXT,
         timestamp TIMESTAMP,
         score INTEGER,
-        author TEXT
+        author TEXT,
+        day_of_week INTEGER,
+        hour_of_day INTEGER,
+        title_length INTEGER
     )
     """)
 
     for _, row in df.iterrows():
         cursor.execute("""
-            INSERT INTO stories (title, domain, timestamp, score, author)
-            VALUES (%s, %s, %s, %s, %s)""",
-                       (row['title'], row['domain'],
-                        row['timestamp'], row['score'], row['author'])
+            INSERT INTO stories (
+                       title,
+                       domain,
+                       timestamp,
+                       score,
+                       author,
+                       day_of_week,
+                       hour_of_day,
+                       title_length
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                       (
+                           row['title'],
+                           row['domain'],
+                           row['timestamp'],
+                           row['score'],
+                           row['author'],
+                           row['day_of_week'],
+                           row['hour_of_day'],
+                           row['title_length']
+                       )
                        )
 
     conn.commit()
