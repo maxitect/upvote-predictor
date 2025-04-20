@@ -1,36 +1,26 @@
+import datetime
 import torch
 import wandb
 import pickle
-import datetime
-import pandas as pd
 from tqdm import tqdm
 import src.model as model
 import src.dataset as dataset
 import src.config as config
 import os
 
+from utils.db_connector import extract_hn_data
+
 dev = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 ts = datetime.datetime.now().strftime('%Y_%m_%d__%H_%M_%S')
 
-df = pd.read_csv(
-    "hf://datasets/artemisweb/hackernewsupvotes/filtered-stories.csv")
-
-# Convert data into the right format
-titles = df['title'].fillna('').values
-urls = df['url'].fillna('').values
-domains = [
-    url.split('/')[2] if url and '/' in url else '<no_domain>' for url in urls]
-timestamps = [pd.to_datetime(time).isoformat() for time in df['time']]
-scores = df['score'].values
-
+df = extract_hn_data()
 vocab_to_int = pickle.load(open(config.VOCAB_TO_ID_PATH, 'rb'))
 
-# And then update the dataset creation to:
 ds = dataset.HackerNewsDataset(
-    titles,
-    domains,
-    timestamps,
-    scores,
+    df['title'].fillna('').values,
+    df['domain'].fillna('').values,
+    df['timestamp'].values,
+    df['score'].values,
     vocab_to_int,
     max_title_len=config.MAX_TITLE_LENGTH
 )
