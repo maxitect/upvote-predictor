@@ -87,19 +87,17 @@ def create_lookup_tables(words):
 
 
 words_to_ids, ids_to_words = create_lookup_tables(corpus)
-print(f"Vocabulary size: {len(words_to_ids)}")
+print(f"Vocabulary size: {len(words_to_ids)}")  # 296,388
 # Create tokens from updated corpus
 tokens = [words_to_ids[word] for word in corpus]
-print(f"Total tokens: {len(tokens)}")
+print(f"Total tokens: {len(tokens)}")  # 61,026,684
 
 print(type(tokens))  # <class 'list'>
-print(len(tokens))  # 16,680,599
-print(tokens[:7])   # [5234, 3081, 12, 6, 195, 2, 3134]
+print(tokens[:7])   # [10031, 5640, 23, 7, 421, 6, 2338]
 
-print(ids_to_words[5234])        # anarchism
-print(words_to_ids['anarchism'])  # 5234
-print(words_to_ids['have'])      # 3081
-print(len(words_to_ids))         # 63,642
+print(ids_to_words[5234])        # threats
+print(words_to_ids['anarchism'])  # 10,031
+print(words_to_ids['have'])      # 33
 
 # Save updated vocabulary
 with open(config.VOCAB_TO_ID_PATH, 'wb') as f:
